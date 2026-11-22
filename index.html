@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Trabalho Prático de Business Intelligence — mapeamento do setor de cafeterias de Betim (MG). PUC Minas Betim, Prof. Clóvis Lemos Tavares." />
+  <meta name="theme-color" content="#0b2c4d" />
+  <title>Cafeterias de Betim — Business Intelligence | PUC Minas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b2c4d'/%3E%3Cpath d='M16 42V26h6v16h-6Zm13 0V18h6v24h-6Zm13 0V32h6v10h-6Z' fill='%2334d0c8'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <header class="site-header" id="topo">
+    <div class="container header-inner">
+      <a class="brand" href="#topo" aria-label="PUC Minas Betim — início">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="38" height="38" role="presentation">
+            <rect width="48" height="48" rx="11" fill="#0b2c4d" />
+            <path d="M24 8l12 5v10c0 8-5 13.5-12 17-7-3.5-12-9-12-17V13l12-5Z" fill="none" stroke="#34d0c8" stroke-width="2.4" />
+            <path d="M17 27v-5h3v5h-3Zm5.5 0V18h3v9h-3Zm5.5 0v-7h3v7h-3Z" fill="#f4b400" />
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>PUC Minas</strong>
+          <small>Betim · Business Intelligence</small>
+        </span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="menu" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="menu" id="menu" aria-label="Navegação principal">
+        <a href="#projeto">Projeto</a>
+        <a href="#integrantes">Integrantes</a>
+        <a href="#metodologia">Metodologia</a>
+        <a href="#dashboard">Dashboard</a>
+        <a class="menu-cta" href="#links">Acessos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- ============ HERO ============ -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="container hero-inner">
+        <div class="hero-copy reveal">
+          <p class="eyebrow"><span class="dot"></span> Trabalho Prático · Business Intelligence</p>
+          <h1 id="hero-title">O mercado de cafeterias de <span class="grad">Betim</span> em dados</h1>
+          <p class="lead">
+            Um estudo de <strong>Inteligência de Negócios</strong> sobre o setor de cafeterias de
+            Betim (MG): coleta primária, modelagem dimensional e um dashboard analítico com
+            seis visões estratégicas para apoiar a tomada de decisão.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-accent" href="#dashboard">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 19V5m0 14h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Explorar dashboard
+            </a>
+            <a class="btn btn-ghost" href="assets/mapa2.pdf" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+              Ver mapa geográfico
+            </a>
+          </div>
+
+          <dl class="hero-stats" aria-label="Indicadores gerais da base">
+            <div>
+              <dt>Cafeterias mapeadas</dt>
+              <dd id="heroTotal">—</dd>
+            </div>
+            <div>
+              <dt>Nota Google média</dt>
+              <dd id="heroNota">—</dd>
+            </div>
+            <div>
+              <dt>Avaliações analisadas</dt>
+              <dd id="heroReviews">—</dd>
+            </div>
+          </dl>
+        </div>
+
+        <aside class="hero-card reveal" aria-label="Ficha do projeto">
+          <div class="hero-card-top">
+            <span class="pill">PUC Minas · Betim</span>
+            <span class="pill pill-soft">2026</span>
+          </div>
+          <h2>Ficha do projeto</h2>
+          <ul class="ficha">
+            <li><span>Disciplina</span><strong>Business Intelligence</strong></li>
+            <li><span>Professor</span><strong>Clóvis Lemos Tavares</strong></li>
+            <li><span>Objeto de estudo</span><strong>Setor de cafeterias de Betim/MG</strong></li>
+            <li><span>Metodologia</span><strong>ETL · Modelagem dimensional · BI</strong></li>
+            <li><span>Entregáveis</span><strong>Site · Dashboard (6 visões) · Mapa</strong></li>
+          </ul>
+          <div class="hero-card-foot">
+            <span class="pulse" aria-hidden="true"></span>
+            Base tratada e pronta para análise
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ PROJETO ============ -->
+    <section class="section" id="projeto" aria-labelledby="projeto-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">Resumo executivo</p>
+          <h2 id="projeto-title">Do dado bruto à decisão</h2>
+          <p class="section-sub">
+            Betim concentra um mercado de cafeterias diverso e pouco documentado. O projeto
+            transforma o mapeamento de campo em uma base analítica confiável, revelando padrões
+            de localização, posicionamento, reputação e disponibilidade operacional.
+          </p>
+        </header>
+
+        <div class="cards-3">
+          <article class="feature-card reveal">
+            <span class="feature-icon">01</span>
+            <h3>Problema</h3>
+            <p>
+              A ausência de uma visão consolidada dificulta comparar bairros, segmentos e
+              modelos de negócio — e identificar onde há espaço para novos entrantes.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon">02</span>
+            <h3>Abordagem</h3>
+            <p>
+              Coleta primária em fontes públicas (Google Maps), padronização via ETL em Python,
+              modelagem dimensional (fato + dimensões) e visualização analítica no Power BI.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon">03</span>
+            <h3>Resultado</h3>
+            <p>
+              Um dashboard público com seis visões e uma landing page que apoia gestores,
+              investidores e estudos acadêmicos sobre o setor.
+            </p>
+          </article>
+        </div>
+
+        <div class="objectives reveal">
+          <h3>Objetivos específicos</h3>
+          <ul class="check-list">
+            <li>Estruturar uma base única e consistente das cafeterias de Betim.</li>
+            <li>Aplicar conceitos de Data Warehouse, ETL e modelagem dimensional.</li>
+            <li>Comparar reputação (nota) e volume de avaliações por segmento.</li>
+            <li>Analisar distribuição geográfica e concentração de mercado por bairro.</li>
+            <li>Medir disponibilidade operacional (horas/semana) por tipo de cafeteria.</li>
+            <li>Comunicar achados com storytelling visual e KPIs executivos.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INTEGRANTES ============ -->
+    <section class="section section-alt" id="integrantes" aria-labelledby="integrantes-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">Equipe</p>
+          <h2 id="integrantes-title">Integrantes do grupo</h2>
+          <p class="section-sub">
+            Campos editáveis: clique em um nome ou matrícula para preencher. As alterações ficam
+            salvas automaticamente neste navegador.
+          </p>
+        </header>
+
+        <div class="membros" id="membros">
+          <div class="membro reveal" data-id="m1">
+            <div class="membro-avatar" aria-hidden="true">01</div>
+            <span class="membro-nome" contenteditable="true" role="textbox" aria-label="Nome do integrante 1" data-field="nome">Nome do integrante</span>
+            <span class="membro-matricula" contenteditable="true" role="textbox" aria-label="Matrícula do integrante 1" data-field="matricula">Matrícula</span>
+          </div>
+          <div class="membro reveal" data-id="m2">
+            <div class="membro-avatar" aria-hidden="true">02</div>
+            <span class="membro-nome" contenteditable="true" role="textbox" aria-label="Nome do integrante 2" data-field="nome">Nome do integrante</span>
+            <span class="membro-matricula" contenteditable="true" role="textbox" aria-label="Matrícula do integrante 2" data-field="matricula">Matrícula</span>
+          </div>
+          <div class="membro reveal" data-id="m3">
+            <div class="membro-avatar" aria-hidden="true">03</div>
+            <span class="membro-nome" contenteditable="true" role="textbox" aria-label="Nome do integrante 3" data-field="nome">Nome do integrante</span>
+            <span class="membro-matricula" contenteditable="true" role="textbox" aria-label="Matrícula do integrante 3" data-field="matricula">Matrícula</span>
+          </div>
+          <div class="membro reveal" data-id="m4">
+            <div class="membro-avatar" aria-hidden="true">04</div>
+            <span class="membro-nome" contenteditable="true" role="textbox" aria-label="Nome do integrante 4" data-field="nome">Nome do integrante</span>
+            <span class="membro-matricula" contenteditable="true" role="textbox" aria-label="Matrícula do integrante 4" data-field="matricula">Matrícula</span>
+          </div>
+        </div>
+        <div class="membros-actions">
+          <button class="btn btn-outline btn-sm" id="addMembro" type="button">+ Adicionar integrante</button>
+          <button class="btn btn-link btn-sm" id="resetMembros" type="button">Restaurar padrão</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ METODOLOGIA ============ -->
+    <section class="section" id="metodologia" aria-labelledby="metodologia-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">Fundamentação e método</p>
+          <h2 id="metodologia-title">Data Warehouse e modelagem dimensional</h2>
+          <p class="section-sub">
+            O projeto segue o fluxo clássico de BI: extração e tratamento (ETL), armazenamento
+            estruturado, modelagem em estrela e camada de apresentação analítica.
+          </p>
+        </header>
+
+        <div class="cards-3 theory-grid">
+          <article class="feature-card reveal">
+            <span class="feature-icon">DW</span>
+            <h3>Data Warehouse</h3>
+            <p>
+              Repositório central, orientado a assunto e não volátil, que consolida dados de
+              diferentes origens para consulta analítica — aqui representado pela base tratada
+              das cafeterias.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon">MD</span>
+            <h3>Modelagem dimensional</h3>
+            <p>
+              Organização em tabela fato (métricas do negócio) e dimensões (contexto de análise),
+              favorecendo consultas rápidas e visões por bairro, tipo, segmento e propriedade.
+            </p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon">BI</span>
+            <h3>Business Intelligence</h3>
+            <p>
+              Conjunto de processos e tecnologias que transforma dados em informação acionável,
+              apoiando decisões com indicadores, dashboards e storytelling visual.
+            </p>
+          </article>
+        </div>
+
+        <div class="split">
+          <div class="timeline reveal">
+            <div class="step">
+              <span class="step-num">1</span>
+              <div>
+                <h3>Coleta primária</h3>
+                <p>Levantamento de cafeterias em fontes públicas, com endereço, coordenadas e atributos de negócio.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">2</span>
+              <div>
+                <h3>ETL</h3>
+                <p>Script Python padroniza nomes, tipos, bairros, números e ausências — gerando um CSV pronto para carga.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">3</span>
+              <div>
+                <h3>Modelagem dimensional</h3>
+                <p>Tabela fato (cafeterias) cercada por dimensões de tipo, segmento, bairro, propriedade, localização e status.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step-num">4</span>
+              <div>
+                <h3>Visualização e decisão</h3>
+                <p>Medidas DAX, seis visões analíticas e KPIs para leitura executiva do mercado.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="model-card reveal" aria-label="Diagrama do modelo em estrela">
+            <h3>Modelo em estrela</h3>
+            <div class="star">
+              <div class="dim dim-1">Tipo</div>
+              <div class="dim dim-2">Segmento</div>
+              <div class="dim dim-3">Bairro</div>
+              <div class="fact">Fato<br /><strong>Cafeterias</strong></div>
+              <div class="dim dim-4">Propriedade</div>
+              <div class="dim dim-5">Localização</div>
+              <div class="dim dim-6">Status</div>
+            </div>
+            <p class="model-note">
+              Fato: notas, avaliações, preço e horas abertas · Dimensões: contexto de análise.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="section section-dark" id="dashboard" aria-labelledby="dashboard-title">
+      <div class="container">
+        <header class="section-head section-head-dark reveal">
+          <p class="kicker">Análise</p>
+          <h2 id="dashboard-title">Dashboard analítico</h2>
+          <p class="section-sub">
+            Prévia interativa dos seis gráficos do projeto, calculada em tempo real a partir da
+            base tratada. A versão oficial está publicada no Power BI (link na seção Acessos).
+          </p>
+        </header>
+
+        <div class="kpi-row" aria-label="Indicadores-chave">
+          <article class="kpi reveal">
+            <span class="kpi-label">Total de cafeterias</span>
+            <strong class="kpi-value" id="kpiTotal">—</strong>
+            <span class="kpi-foot">estabelecimentos mapeados</span>
+          </article>
+          <article class="kpi reveal">
+            <span class="kpi-label">Reputação média</span>
+            <strong class="kpi-value" id="kpiNota">—</strong>
+            <span class="kpi-foot">nota Google (0–5)</span>
+          </article>
+          <article class="kpi reveal">
+            <span class="kpi-label">Avaliações acumuladas</span>
+            <strong class="kpi-value" id="kpiReviews">—</strong>
+            <span class="kpi-foot">volume de reviews</span>
+          </article>
+        </div>
+
+        <div class="charts-grid">
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">01</span>
+              <div>
+                <h3>Nota × Volume de avaliações</h3>
+                <p>Dispersão por segmento — eixo Y em escala logarítmica.</p>
+              </div>
+            </header>
+            <div class="chart-box"><canvas id="chartScatter" role="img" aria-label="Gráfico de dispersão entre nota Google e número de avaliações"></canvas></div>
+            <p class="chart-insight" id="insightScatter"></p>
+          </article>
+
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">02</span>
+              <div>
+                <h3>Distribuição por bairro</h3>
+                <p>Contagem de estabelecimentos por região.</p>
+              </div>
+            </header>
+            <div class="chart-box"><canvas id="chartBairro" role="img" aria-label="Gráfico de barras com a contagem de cafeterias por bairro"></canvas></div>
+            <p class="chart-insight" id="insightBairro"></p>
+          </article>
+
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">03</span>
+              <div>
+                <h3>Participação por segmento</h3>
+                <p>Popular, intermediária e premium.</p>
+              </div>
+            </header>
+            <div class="chart-box"><canvas id="chartSegmento" role="img" aria-label="Gráfico de rosca com a participação de mercado por segmento"></canvas></div>
+            <p class="chart-insight" id="insightSegmento"></p>
+          </article>
+
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">04</span>
+              <div>
+                <h3>Horas abertas por tipo</h3>
+                <p>Disponibilidade operacional média semanal.</p>
+              </div>
+            </header>
+            <div class="chart-box"><canvas id="chartHoras" role="img" aria-label="Gráfico de colunas com a média de horas abertas por semana por tipo de cafeteria"></canvas></div>
+            <p class="chart-insight" id="insightHoras"></p>
+          </article>
+
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">05</span>
+              <div>
+                <h3>Propriedade × Localização</h3>
+                <p>Treemap de independentes e redes por tipo de ponto.</p>
+              </div>
+            </header>
+            <div class="treemap" id="treemap" role="img" aria-label="Treemap de propriedade e localização das cafeterias"></div>
+            <p class="chart-insight" id="insightTreemap"></p>
+          </article>
+
+          <article class="chart-card reveal">
+            <header class="chart-head">
+              <span class="chart-num">06</span>
+              <div>
+                <h3>Leitura executiva</h3>
+                <p>Síntese dos indicadores e achados principais.</p>
+              </div>
+            </header>
+            <div class="insight-panel" id="insightPanel">
+              <ul id="insightList"></ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ACESSOS ============ -->
+    <section class="section" id="links" aria-labelledby="links-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="kicker">Entregáveis</p>
+          <h2 id="links-title">Acessos oficiais</h2>
+          <p class="section-sub">
+            Consulte o mapa geográfico do mapeamento e o dashboard publicado no Power BI.
+          </p>
+        </header>
+
+        <div class="cta-grid">
+          <article class="cta-card cta-map reveal">
+            <div class="cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <h3>Mapa geográfico</h3>
+            <p>Arquivo <code>mapa2.pdf</code> com a distribuição espacial das cafeterias mapeadas.</p>
+            <div class="cta-actions">
+              <button class="btn btn-primary" id="openMapa" type="button">Visualizar mapa</button>
+              <a class="btn btn-outline" href="assets/mapa2.pdf" target="_blank" rel="noopener">Abrir em nova aba</a>
+            </div>
+          </article>
+
+          <article class="cta-card cta-bi reveal">
+            <div class="cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28"><path d="M4 19V5m0 14h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="7" y="11" width="3" height="5" fill="currentColor"/><rect x="12" y="8" width="3" height="8" fill="currentColor"/><rect x="17" y="13" width="3" height="3" fill="currentColor"/></svg>
+            </div>
+            <h3>Dashboard Power BI</h3>
+            <p>Relatório publicado com os seis gráficos analíticos e filtros interativos.</p>
+            <div class="cta-actions">
+              <a class="btn btn-accent" id="btnPowerBI" href="#" target="_blank" rel="noopener">Abrir dashboard</a>
+              <span class="cta-note" id="powerbiStatus">Link a configurar em <code>app.js</code></span>
+            </div>
+          </article>
+        </div>
+
+        <div class="tech-strip reveal" aria-label="Tecnologias utilizadas">
+          <span>Python</span><span>ETL</span><span>Modelagem dimensional</span><span>DAX</span><span>Power BI</span><span>Chart.js</span><span>HTML · CSS · JS</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <strong>PUC Minas · Betim</strong>
+        <p>Business Intelligence — Trabalho Prático 2026</p>
+      </div>
+      <div class="footer-meta">
+        <p>Prof. Clóvis Lemos Tavares</p>
+        <p>Base atualizada em <span id="baseData">—</span></p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>Projeto acadêmico sem fins comerciais. Dados coletados de fontes públicas.</p>
+      <a href="#topo">Voltar ao topo ↑</a>
+    </div>
+  </footer>
+
+  <!-- Modal do mapa -->
+  <dialog class="map-modal" id="mapModal" aria-labelledby="mapModalTitle">
+    <div class="map-modal-head">
+      <h2 id="mapModalTitle">Mapa geográfico — Cafeterias de Betim</h2>
+      <div class="map-modal-actions">
+        <a class="btn btn-sm btn-outline" href="assets/mapa2.pdf" target="_blank" rel="noopener">Nova aba</a>
+        <button class="icon-btn" id="closeMapa" type="button" aria-label="Fechar mapa">✕</button>
+      </div>
+    </div>
+    <div class="map-modal-body">
+      <iframe src="assets/mapa2.pdf" title="Mapa geográfico em PDF" loading="lazy"></iframe>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="assets/data/cafeterias.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
