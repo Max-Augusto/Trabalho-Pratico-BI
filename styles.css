@@ -964,6 +964,36 @@ code {
   margin-top: 18px;
 }
 
+.map-card {
+  margin-top: 18px;
+}
+
+.map-card-head {
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.map-card-btn {
+  border-color: rgba(244, 239, 230, 0.24);
+  color: var(--bone);
+}
+
+.map-card-btn:hover {
+  background: rgba(244, 239, 230, 0.1);
+  border-color: rgba(244, 239, 230, 0.45);
+  color: var(--bone);
+}
+
+.map-image {
+  width: 100%;
+  max-height: 760px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  border: 1px solid var(--line-dark);
+}
+
 .insight-panel {
   flex: 1;
   display: flex;

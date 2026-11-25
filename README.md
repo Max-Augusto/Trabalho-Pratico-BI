@@ -28,6 +28,7 @@ O projeto abrange desde a coleta primária de dados públicos até a camada de v
 ├── powerbi_setup.md                  # Documentação de modelagem, medidas DAX e publicação
 └── assets/
     ├── mapa2.pdf                     # Mapa geográfico das cafeterias mapeadas
+    ├── mapa-betim.png                # Versão em imagem do mapa exibida na página web
     ├── Graficos Power BI.pdf         # Exportação em PDF dos gráficos do Power BI
     ├── cafeterias-betim-power-bi.pdf # Relatório completo exportado do Power BI
     ├── graficos-power-bi/            # Imagens PNG dos 6 gráficos exibidos na página
