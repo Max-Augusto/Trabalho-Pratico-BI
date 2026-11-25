@@ -1,35 +1,18 @@
 /* =========================================================
    Cafeterias de Betim — Business Intelligence | PUC Minas
-   app.js — dados, KPIs, gráficos (Chart.js) e interações
+   app.js — dados, KPIs, análises e interações
    ========================================================= */
 
 "use strict";
 
 /* ---------------------------------------------------------
    CONFIGURAÇÃO
-   Cole aqui o link público do relatório publicado no Power BI
-   (Publish to web → https://app.powerbi.com/view?r=...)
+   Link direto para a página de análise no Power BI Service.
+   A abertura exige acesso ao relatório.
    --------------------------------------------------------- */
-const POWER_BI_URL = "";
+const POWER_BI_URL = "https://app.powerbi.com/groups/me/reports/9ffbf44e-73de-4eb8-b84b-d2356a246e92/4b4de60277d36389e563?experience=power-bi";
 
 const DATA = Array.isArray(window.CAFETERIAS_BETIM) ? window.CAFETERIAS_BETIM : [];
-
-const CORES = {
-  popular: "#f4b400",
-  intermediaria: "#34d0c8",
-  premium: "#7fb2ff",
-  barraAlta: "#34d0c8",
-  barraBaixa: "rgba(255, 255, 255, 0.20)",
-  texto: "#cfe0ef",
-  grade: "rgba(255, 255, 255, 0.07)",
-};
-
-const SEGMENTO_COR = {
-  Popular: CORES.popular,
-  Intermediária: CORES.intermediaria,
-  "Intermediaria": CORES.intermediaria,
-  Premium: CORES.premium,
-};
 
 const nfInt = new Intl.NumberFormat("pt-BR");
 const nfDec1 = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -113,76 +96,6 @@ function preencherKPIs() {
 
 /* ----------------------------- Chart.js padrões ----------------------------- */
 
-function configurarChartJS() {
-  if (!window.Chart) return false;
-  Chart.defaults.font.family = '"Inter", system-ui, sans-serif';
-  Chart.defaults.font.size = 11;
-  Chart.defaults.color = CORES.texto;
-  Chart.defaults.borderColor = CORES.grade;
-  Chart.defaults.plugins.legend.labels.usePointStyle = true;
-  Chart.defaults.plugins.legend.labels.boxWidth = 8;
-  Chart.defaults.plugins.legend.labels.padding = 14;
-  Chart.defaults.plugins.tooltip.backgroundColor = "rgba(7, 30, 53, 0.96)";
-  Chart.defaults.plugins.tooltip.borderColor = "rgba(52, 208, 200, 0.35)";
-  Chart.defaults.plugins.tooltip.borderWidth = 1;
-  Chart.defaults.plugins.tooltip.padding = 10;
-  Chart.defaults.plugins.tooltip.titleFont = { weight: "600" };
-  return true;
-}
-
-/* Plugin simples para exibir valores ao final das barras */
-const rotulosValor = {
-  id: "rotulosValor",
-  afterDatasetsDraw(chart, _args, opcoes) {
-    if (!opcoes || opcoes.display === false) return;
-    const { ctx } = chart;
-    const horizontal = chart.options.indexAxis === "y";
-    const formatador = opcoes.formatador || ((v) => nfInt.format(v));
-    chart.data.datasets.forEach((dataset, i) => {
-      const meta = chart.getDatasetMeta(i);
-      if (meta.hidden) return;
-      meta.data.forEach((elemento, indice) => {
-        const valor = dataset.data[indice];
-        if (typeof valor !== "number") return;
-        ctx.save();
-        ctx.fillStyle = opcoes.color || "#dce9f5";
-        ctx.font = '600 10.5px "Inter", sans-serif';
-        if (horizontal) {
-          ctx.textAlign = "left";
-          ctx.textBaseline = "middle";
-          ctx.fillText(formatador(valor), elemento.x + 7, elemento.y);
-        } else {
-          ctx.textAlign = "center";
-          ctx.textBaseline = "bottom";
-          ctx.fillText(formatador(valor), elemento.x, elemento.y - 6);
-        }
-        ctx.restore();
-      });
-    });
-  },
-};
-
-/* Texto central da rosca */
-const textoCentroRosca = {
-  id: "textoCentroRosca",
-  afterDraw(chart) {
-    const opcoes = chart.options.plugins?.textoCentroRosca;
-    if (!opcoes || opcoes.display === false) return;
-    const { ctx, chartArea } = chart;
-    const x = (chartArea.left + chartArea.right) / 2;
-    const y = (chartArea.top + chartArea.bottom) / 2;
-    ctx.save();
-    ctx.textAlign = "center";
-    ctx.fillStyle = "#ffffff";
-    ctx.font = '700 26px "Sora", "Inter", sans-serif';
-    ctx.fillText(opcoes.valor, x, y + 2);
-    ctx.fillStyle = "#93aec8";
-    ctx.font = '500 11px "Inter", sans-serif';
-    ctx.fillText(opcoes.rotulo, x, y + 22);
-    ctx.restore();
-  },
-};
-
 /* ----------------------------- Insights ----------------------------- */
 
 function nomeMaisAvaliado() {
@@ -252,6 +165,14 @@ function renderizarInsights() {
     `Operações <strong>independentes</strong> somam ${independentes} de ${METRICAS.total} (${Math.round((independentes / METRICAS.total) * 100)}%), e <strong>${Math.round((rua / METRICAS.total) * 100)}%</strong> do mercado está em lojas de rua — o shopping é canal residual, típico de redes.`
   );
 
+  const faixaPrincipal = contarPor("faixa_preco")[0];
+  if (faixaPrincipal) {
+    set(
+      "insightPreco",
+      `A faixa <strong>${escapeHtml(faixaPrincipal[0])}</strong> concentra ${faixaPrincipal[1]} de ${METRICAS.total} cafeterias (${Math.round((faixaPrincipal[1] / METRICAS.total) * 100)}%); faixas mais altas tendem a sustentar notas médias superiores.`
+    );
+  }
+
   const listaInsights = document.getElementById("insightList");
   if (listaInsights) {
     const itens = [
@@ -265,398 +186,39 @@ function renderizarInsights() {
   }
 }
 
-/* ----------------------------- Gráficos ----------------------------- */
-
-function criarGraficoDispersao() {
-  const canvas = document.getElementById("chartScatter");
-  if (!canvas) return;
-
-  const segmentos = [...new Set(DATA.map((d) => d.segmento))];
-  const datasets = segmentos.map((segmento) => ({
-    label: segmento,
-    data: DATA.filter((d) => d.segmento === segmento)
-      .filter((d) => typeof d.nota_google === "number" && typeof d.num_avaliacoes === "number")
-      .map((d) => ({ x: d.nota_google, y: d.num_avaliacoes, nome: d.nome })),
-    backgroundColor: `${SEGMENTO_COR[segmento] || CORES.intermediaria}cc`,
-    borderColor: "#071e35",
-    borderWidth: 1.5,
-    pointRadius: 7,
-    pointHoverRadius: 10,
-  }));
-
-  new Chart(canvas, {
-    type: "scatter",
-    data: { datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: {
-          min: 3.7,
-          max: 5,
-          title: { display: true, text: "Nota Google", color: "#93aec8" },
-          grid: { color: CORES.grade },
-          ticks: { stepSize: 0.2 },
-        },
-        y: {
-          type: "logarithmic",
-          min: 1,
-          title: { display: true, text: "Nº de avaliações (escala log)", color: "#93aec8" },
-          grid: { color: CORES.grade },
-          ticks: { callback: (v) => nfInt.format(v) },
-        },
-      },
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const p = ctx.raw;
-              return `${p.nome} — nota ${nfDec1.format(p.x)} · ${nfInt.format(p.y)} avaliações`;
-            },
-          },
-        },
-      },
-    },
-  });
-}
-
-function criarGraficoBairro() {
-  const canvas = document.getElementById("chartBairro");
-  if (!canvas) return;
-  const ranking = contarPor("bairro");
-  const destaque = new Set(["Centro", "Angola", "Ingá", "São João"]);
-
-  new Chart(canvas, {
-    type: "bar",
-    data: {
-      labels: ranking.map(([bairro]) => bairro),
-      datasets: [
-        {
-          label: "Estabelecimentos",
-          data: ranking.map(([, total]) => total),
-          backgroundColor: ranking.map(([bairro]) =>
-            destaque.has(bairro) ? CORES.barraAlta : CORES.barraBaixa
-          ),
-          borderRadius: 6,
-          borderSkipped: false,
-          barThickness: 16,
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { right: 26 } },
-      scales: {
-        x: {
-          beginAtZero: true,
-          ticks: { precision: 0 },
-          grid: { color: CORES.grade },
-          title: { display: true, text: "Nº de cafeterias", color: "#93aec8" },
-        },
-        y: { grid: { display: false } },
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => `${ctx.raw} cafeteria(s) · ${Math.round((ctx.raw / METRICAS.total) * 100)}% da base`,
-          },
-        },
-        rotulosValor: { color: "#dce9f5" },
-      },
-    },
-    plugins: [rotulosValor],
-  });
-}
-
-function criarGraficoRosca() {
-  const canvas = document.getElementById("chartSegmento");
-  if (!canvas) return;
-  const ranking = contarPor("segmento");
-
-  new Chart(canvas, {
-    type: "doughnut",
-    data: {
-      labels: ranking.map(([segmento]) => segmento),
-      datasets: [
-        {
-          data: ranking.map(([, total]) => total),
-          backgroundColor: ranking.map(
-            ([segmento]) => SEGMENTO_COR[segmento] || CORES.intermediaria
-          ),
-          borderColor: "#0c2946",
-          borderWidth: 3,
-          hoverOffset: 8,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: "62%",
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => `${ctx.label}: ${ctx.raw} (${Math.round((ctx.raw / METRICAS.total) * 100)}%)`,
-          },
-        },
-        textoCentroRosca: { valor: String(METRICAS.total), rotulo: "cafeterias" },
-      },
-    },
-    plugins: [textoCentroRosca],
-  });
-}
-
-function criarGraficoHoras() {
-  const canvas = document.getElementById("chartHoras");
-  if (!canvas) return;
-
-  const mapa = new Map();
-  DATA.forEach((d) => {
-    if (typeof d.horas_semana !== "number") return;
-    const lista = mapa.get(d.tipo) || [];
-    lista.push(d.horas_semana);
-    mapa.set(d.tipo, lista);
-  });
-
-  const dados = [...mapa.entries()]
-    .map(([tipo, valores]) => ({ tipo, media: Number(media(valores).toFixed(1)) }))
-    .sort((a, b) => b.media - a.media);
-
-  const encurtar = (texto) => texto.replace(/\s*\/\s*/g, "/").replace("Cafeteria/", "Caf./");
-
-  new Chart(canvas, {
-    type: "bar",
-    data: {
-      labels: dados.map((d) => encurtar(d.tipo)),
-      datasets: [
-        {
-          label: "Horas por semana",
-          data: dados.map((d) => d.media),
-          backgroundColor: dados.map((_, i) =>
-            i === 0 ? CORES.barraAlta : "rgba(52, 208, 200, 0.42)"
-          ),
-          borderRadius: 6,
-          borderSkipped: false,
-          maxBarThickness: 34,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      layout: { padding: { top: 22 } },
-      scales: {
-        x: {
-          ticks: { autoSkip: false, maxRotation: 42, minRotation: 30, font: { size: 9 } },
-          grid: { display: false },
-        },
-        y: {
-          beginAtZero: true,
-          title: { display: true, text: "Média de horas/semana", color: "#93aec8" },
-          grid: { color: CORES.grade },
-        },
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            title: (itens) => dados[itens[0].dataIndex].tipo,
-            label: (ctx) => `${nfDec1.format(ctx.raw)} h por semana (média)`,
-          },
-        },
-        rotulosValor: { color: "#dce9f5", formatador: (v) => `${nfDec1.format(v)}h` },
-      },
-    },
-    plugins: [rotulosValor],
-  });
-}
-
-function criarTreemap() {
-  const container = document.getElementById("treemap");
-  if (!container) return;
-
-  const grupos = new Map();
-  DATA.forEach((d) => {
-    const propriedade = d.propriedade || "Não informado";
-    const local = d.localizacao_simplificada || "Não informado";
-    if (!grupos.has(propriedade)) grupos.set(propriedade, new Map());
-    const locais = grupos.get(propriedade);
-    locais.set(local, (locais.get(local) || 0) + 1);
-  });
-
-  const gruposOrdenados = [...grupos.entries()].sort((a, b) => {
-    const totalA = [...a[1].values()].reduce((x, y) => x + y, 0);
-    const totalB = [...b[1].values()].reduce((x, y) => x + y, 0);
-    return totalB - totalA;
-  });
-
-  container.innerHTML = "";
-
-  gruposOrdenados.forEach(([propriedade, locais]) => {
-    const totalGrupo = [...locais.values()].reduce((a, b) => a + b, 0);
-    const grupo = document.createElement("div");
-    grupo.className = "tm-group";
-    grupo.style.flexGrow = String(totalGrupo);
-
-    const head = document.createElement("div");
-    head.className = "tm-group-head";
-    head.innerHTML = `<span>${escapeHtml(propriedade)}</span><small>${totalGrupo}</small>`;
-
-    const tiles = document.createElement("div");
-    tiles.className = "tm-tiles";
-
-    [...locais.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .forEach(([local, total]) => {
-        const tile = document.createElement("div");
-        tile.className = `tm-tile ${
-          propriedade === "Rede" ? "tm-tile-rede" : "tm-tile-indep"
-        }`;
-        tile.style.flexGrow = String(total);
-        tile.title = `${propriedade} · ${local}: ${total} cafeteria(s)`;
-        const rotulo = document.createElement("span");
-        rotulo.textContent = local;
-        const valor = document.createElement("strong");
-        valor.textContent = total;
-        tile.append(rotulo, valor);
-        tiles.appendChild(tile);
-      });
-
-    grupo.append(head, tiles);
-    container.appendChild(grupo);
-  });
-}
-
-/* ----------------------------- Integrantes ----------------------------- */
-
-const STORAGE_KEY = "bi-betim-integrantes-v1";
-let estadoMembros = [];
-
-function lerMembrosDoDOM() {
-  return [...document.querySelectorAll("#membros .membro")].map((card, indice) => {
-    const nome = card.querySelector(".membro-nome")?.textContent.trim() || "";
-    const matricula = card.querySelector(".membro-matricula")?.textContent.trim() || "";
-    return {
-      nome: /^nome do integrante$/i.test(nome) ? "" : nome,
-      matricula: /^matr[íi]cula$/i.test(matricula) ? "" : matricula,
-      indice,
-    };
-  });
-}
-
-function carregarMembros() {
-  try {
-    const salvo = window.localStorage.getItem(STORAGE_KEY);
-    if (salvo) {
-      const dados = JSON.parse(salvo);
-      if (Array.isArray(dados) && dados.length) {
-        return dados.map((m) => ({ nome: String(m.nome || ""), matricula: String(m.matricula || "") }));
-      }
-    }
-  } catch (_erro) {
-    /* armazenamento indisponível — segue com padrão */
-  }
-  return lerMembrosDoDOM();
-}
-
-function salvarMembros() {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(estadoMembros));
-  } catch (_erro) {
-    /* ignora falha de armazenamento */
-  }
-}
-
-function renderizarMembros() {
-  const container = document.getElementById("membros");
-  if (!container) return;
-  container.innerHTML = "";
-
-  estadoMembros.forEach((membro, indice) => {
-    const card = document.createElement("div");
-    card.className = "membro reveal in";
-
-    const avatar = document.createElement("div");
-    avatar.className = "membro-avatar";
-    avatar.setAttribute("aria-hidden", "true");
-    avatar.textContent = String(indice + 1).padStart(2, "0");
-
-    const nome = document.createElement("span");
-    nome.className = "membro-nome";
-    nome.contentEditable = "true";
-    nome.setAttribute("role", "textbox");
-    nome.setAttribute("aria-label", `Nome do integrante ${indice + 1}`);
-    nome.dataset.field = "Nome do integrante";
-    nome.textContent = membro.nome;
-
-    const matricula = document.createElement("span");
-    matricula.className = "membro-matricula";
-    matricula.contentEditable = "true";
-    matricula.setAttribute("role", "textbox");
-    matricula.setAttribute("aria-label", `Matrícula do integrante ${indice + 1}`);
-    matricula.dataset.field = "Matrícula";
-    matricula.textContent = membro.matricula;
-
-    const aoEditar = () => {
-      estadoMembros[indice] = {
-        nome: nome.textContent.trim(),
-        matricula: matricula.textContent.trim(),
-      };
-      salvarMembros();
-    };
-
-    nome.addEventListener("input", aoEditar);
-    matricula.addEventListener("input", aoEditar);
-    [nome, matricula].forEach((campo) => {
-      campo.addEventListener("keydown", (evento) => {
-        if (evento.key === "Enter") {
-          evento.preventDefault();
-          campo.blur();
-        }
-      });
-    });
-
-    card.append(avatar, nome, matricula);
-    container.appendChild(card);
-  });
-}
-
-function configurarMembros() {
-  estadoMembros = carregarMembros();
-  renderizarMembros();
-
-  document.getElementById("addMembro")?.addEventListener("click", () => {
-    estadoMembros.push({ nome: "", matricula: "" });
-    salvarMembros();
-    renderizarMembros();
-    const cards = document.querySelectorAll("#membros .membro");
-    const ultimo = cards[cards.length - 1]?.querySelector(".membro-nome");
-    ultimo?.focus();
-  });
-
-  document.getElementById("resetMembros")?.addEventListener("click", () => {
-    if (!window.confirm("Restaurar os campos para o padrão? Os nomes salvos serão apagados.")) return;
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch (_erro) {
-      /* ignora */
-    }
-    estadoMembros = Array.from({ length: 4 }, () => ({ nome: "", matricula: "" }));
-    salvarMembros();
-    renderizarMembros();
-  });
-}
-
 /* ----------------------------- Navegação / UI ----------------------------- */
 
 function configurarNavegacao() {
   const toggle = document.getElementById("navToggle");
   const menu = document.getElementById("menu");
+  const header = document.querySelector(".site-header");
+
+  document.querySelectorAll('a[href^="#"]').forEach((link) => {
+    link.addEventListener("click", (evento) => {
+      const href = link.getAttribute("href");
+      if (!href || href === "#") return;
+
+      if (href === "#topo") {
+        evento.preventDefault();
+        window.scrollTo({ top: 0, behavior: semMovimento ? "auto" : "smooth" });
+        return;
+      }
+
+      const alvo = document.getElementById(href.slice(1));
+      if (!alvo) return;
+
+      evento.preventDefault();
+      const titulo = alvo.querySelector(".section-head") || alvo;
+      const headerH = header?.offsetHeight || 72;
+      const destino = Math.max(
+        0,
+        titulo.getBoundingClientRect().top + window.scrollY - headerH - 28
+      );
+      window.scrollTo({ top: destino, behavior: semMovimento ? "auto" : "smooth" });
+      history.replaceState(null, "", href);
+    });
+  });
+
   if (!toggle || !menu) return;
 
   toggle.addEventListener("click", () => {
@@ -698,7 +260,7 @@ function configurarPowerBI() {
 
   if (POWER_BI_URL) {
     botao.href = POWER_BI_URL;
-    status.textContent = "Relatório publicado e pronto para consulta";
+    status.textContent = "O Power BI exige login e acesso ao relatório.";
   } else {
     botao.href = "#";
     status.innerHTML = "Link a configurar em <code>app.js</code> (veja powerbi_setup.md)";
@@ -706,7 +268,7 @@ function configurarPowerBI() {
       evento.preventDefault();
       window.alert(
         "O link do Power BI ainda não foi configurado.\n\n" +
-          "Publique o relatório (Publish to web) e cole a URL em POWER_BI_URL no arquivo app.js."
+          "Configure o link da página do relatório em POWER_BI_URL no arquivo app.js."
       );
     });
   }
@@ -737,7 +299,6 @@ function configurarReveal() {
 function iniciar() {
   preencherKPIs();
   configurarNavegacao();
-  configurarMembros();
   configurarModalMapa();
   configurarPowerBI();
   configurarReveal();
@@ -748,20 +309,6 @@ function iniciar() {
   }
 
   renderizarInsights();
-  criarTreemap();
-
-  if (configurarChartJS()) {
-    criarGraficoDispersao();
-    criarGraficoBairro();
-    criarGraficoRosca();
-    criarGraficoHoras();
-  } else {
-    document.querySelectorAll(".chart-box").forEach((box) => {
-      box.innerHTML =
-        '<p style="display:grid;place-items:center;height:100%;color:#93aec8;font-size:.85rem;text-align:center">' +
-        "Chart.js não carregou (verifique a conexão).<br/>Os KPIs e o treemap continuam disponíveis.</p>";
-    });
-  }
 }
 
 if (document.readyState === "loading") {

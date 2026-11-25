@@ -3,8 +3,9 @@
 **Trabalho Prático de Business Intelligence — PUC Minas / Betim**
 Prof. Clóvis Lemos Tavares
 
-Este guia parte do arquivo tratado pelo ETL (`assets/data/cafeterias_betim_bi.csv`) e chega ao
-dashboard publicado com link/iframe para a landing page.
+O relatório entregue está na página **Análise das cafeterias**, com seis gráficos no Power BI Service. O acesso depende das permissões da conta Microsoft. [Abrir relatório](https://app.powerbi.com/groups/me/reports/9ffbf44e-73de-4eb8-b84b-d2356a246e92/4b4de60277d36389e563?experience=power-bi)
+
+O [status da entrega](STATUS_TRABALHO_BI.txt) registra os gráficos e as medidas usadas. As seções de montagem abaixo descrevem o procedimento de referência a partir da base tratada pelo ETL.
 
 ---
 
@@ -219,35 +220,11 @@ Opcional: um quarto cartão com `Horas Medias Formatada`.
 
 ---
 
-## 5. Publicar no Power BI Service e obter o link
+## 5. Acesso ao relatório pela página do trabalho
 
-1. No Power BI Desktop: `Página Inicial → Publicar`.
-2. Escolha um **workspace** (ex.: “PUC Minas — BI Betim”) e confirme.
-3. Abra `app.powerbi.com`, entre no workspace e abra o relatório.
-4. (Opcional) Crie um **dashboard** e fixe os 6 visuais para a visão executiva.
-5. Gere o link público:
-   - **Opção A — Publish to web (link/iframe público, ideal para o trabalho):**
-     `Arquivo → Inserir relatório → Publicar na Web → Criar código de incorporação`.
-     Copie a URL do iframe (`https://app.powerbi.com/view?r=...`).
-     - Atenção: qualquer pessoa com o link vê os dados; não use dados sensíveis.
-     - Alguns tenants institucionais bloqueiam “Publicar na Web” — nesse caso use a Opção B.
-   - **Opção B — Compartilhar/Incorporar seguro:**
-     `Compartilhar → Incorporar → Site ou portal (URL)`. Exige login Microsoft para abrir.
+A seção **Dashboard analítico** de `index.html` exibe os seis gráficos em
+uma grade. As imagens em `assets/graficos-power-bi/` foram extraídas de
+`assets/Graficos Power BI.pdf` e podem ser vistas sem login.
 
-6. Cole o link no arquivo `app.js`:
-
-```js
-const POWER_BI_URL = "https://app.powerbi.com/view?r=SEU_CODIGO_AQUI";
-```
-
-Enquanto o link não for configurado, a página exibe um aviso amigável no botão do
-dashboard (a prévia dos 6 gráficos via Chart.js continua funcionando).
-
-### Checklist de publicação
-- [ ] CSV importado com tipos corretos
-- [ ] 3 cartões de KPI + 5 visuais analíticos (os 6 itens da especificação)
-- [ ] Títulos, rótulos e ordenação aplicados
-- [ ] Relatório publicado no workspace
-- [ ] Link público (Publish to web) copiado
-- [ ] `POWER_BI_URL` atualizado em `app.js`
-- [ ] Site publicado (GitHub Pages/Vercel) e testado no celular
+O botão **Abrir dashboard** leva ao relatório interativo no Power BI e requer
+login e permissão.
