@@ -4,6 +4,8 @@ Estudo de **Inteligência de Negócios (BI)** sobre o mercado de cafeterias de *
 
 O projeto abrange desde a coleta primária de dados públicos até a camada de visualização analítica, com pipeline de **ETL em Python**, **modelagem dimensional (modelo em estrela)**, **dashboard oficial no Power BI** e **landing page** exibindo os 6 gráficos gerados no Power BI.
 
+- **Página publicada (GitHub Pages):** [https://max-augusto.github.io/Trabalho-Pratico-BI/](https://max-augusto.github.io/Trabalho-Pratico-BI/)
+
 ---
 
 ## Principais Indicadores da Base
